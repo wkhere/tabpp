@@ -1,17 +1,15 @@
-// +build !windows,!plan9,!solaris
-
 package tabpp
 
 import (
 	"os"
 
-	"golang.org/x/sys/unix"
+	"golang.org/x/term"
 )
 
 func ncolumns(f *os.File) (int, error) {
-	ws, err := unix.IoctlGetWinsize(int(f.Fd()), unix.TIOCGWINSZ)
+	w, _, err := term.GetSize(int(f.Fd()))
 	if err != nil {
 		return -1, err
 	}
-	return int(ws.Col), nil
+	return w, nil
 }
