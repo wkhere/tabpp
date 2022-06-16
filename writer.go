@@ -86,7 +86,7 @@ func (w *alternativeWriter) Flush() (err error) {
 	tabb := w.tabw.innerw.(*bytes.Buffer)
 
 	fit, total := bufStats(tabb, w.width)
-	if fit < total/2 {
+	if fit <= total/2 {
 		_, err = io.Copy(w.targetw, plainb)
 	} else {
 		_, err = io.Copy(w.targetw, tabb)
@@ -96,11 +96,23 @@ func (w *alternativeWriter) Flush() (err error) {
 
 func bufStats(b *bytes.Buffer, width int) (linesFit, linesTotal int) {
 	lines := bytes.Split(b.Bytes(), []byte{'\n'})
+	trimLastIfEmpty(&lines)
 	linesTotal = len(lines)
 	for _, l := range lines {
-		if len(l) <= width {
+		if len(l) < width {
 			linesFit++
 		}
 	}
 	return
+}
+
+func trimLastIfEmpty(bb *[][]byte) {
+	if len(*bb) == 0 {
+		return
+	}
+	l := len(*bb) - 1
+	b := (*bb)[l]
+	if len(b) == 0 {
+		*bb = (*bb)[:l]
+	}
 }
