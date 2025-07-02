@@ -1,5 +1,4 @@
 go:
-	go fmt
-	go install
+	go build
 
 .PHONY: go
